@@ -25,6 +25,9 @@
         </li>
       </ul>
     </div>
+    <div class="list-fixed" ref="fixed">
+      <div class="fixed-title">{{fixedTitle}}</div>
+    </div>
     <div v-show="!data.length" class="loading-container">
       <loading></loading>
     </div>
@@ -37,6 +40,7 @@
   import {getData} from 'common/js/dom'
 
   const ANCHOR_HEIGHT = 18;
+  const TITLE_HEIGHT = 30;
 
   export default {
     props:{
@@ -49,6 +53,7 @@
       return {
         currentIndex: 0,
         scrollY: -1,
+        diff: -1
       }
     },
     created(){
@@ -87,8 +92,17 @@
           this.listHeight.push(height)
         }
       },
-      _scrollTo(index){
-        this.$refs.listview.scrollToElement(this.$refs.listGroup[index]);
+      _scrollTo(index) {
+        if (!index && index !== 0) {
+          return
+        }
+        if (index < 0) {
+          index = 0
+        } else if (index > this.listHeight.length - 2) {
+          index = this.listHeight.length - 2
+        }
+        this.scrollY = -this.listHeight[index]
+        this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
       }
     },
     computed:{
@@ -96,12 +110,19 @@
         return this.data.map((item) => {
           return item.title.substr(0,1)
         })
+      },
+      fixedTitle() {
+        if (this.scrollY > 0) {
+          return ''
+        }
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
       }
     },
     watch:{
       data(){
         setTimeout(() => {
           this._calculateHeight()
+          console.info(this.listHeight)
         },20)
       },
       scrollY(newY){
@@ -113,11 +134,20 @@
         for (let i = 0; i < listHeight.length - 1; i++){
           let hei_1 = listHeight[i]
           let hei_2 = listHeight[i+1]
-          if(-newY > hei_1 && -newY < hei_2){
+          if(-newY >= hei_1 && -newY < hei_2){
             this.currentIndex = i;
+            this.diff = hei_2 + newY
             return
           }
         }
+      },
+      diff(newVal) {
+        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0 ;
+        if (this.fixedTop === fixedTop) {
+          return
+        }
+        this.fixedTop = fixedTop
+        this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
       }
     },
     components:{
