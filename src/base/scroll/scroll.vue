@@ -9,6 +9,9 @@
 
   export default {
     props: {
+      /** * 1 滚动的时候会派发scroll事件，会截流。
+       *  * 2 滚动的时候实时派发scroll事件，不会截流。
+       *  * 3 除了实时派发scroll事件，在swipe的情况下仍然能实时派发scroll事件 */
       probeType: {
         type: Number,
         default: 1
@@ -53,24 +56,10 @@
           click: this.click
         })
 
-        if (this.listenScroll) {
+        if(this.listenScroll) {
           let me = this
           this.scroll.on('scroll', (pos) => {
             me.$emit('scroll', pos)
-          })
-        }
-
-        if (this.pullup) {
-          this.scroll.on('scrollEnd', () => {
-            if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
-              this.$emit('scrollToEnd')
-            }
-          })
-        }
-
-        if (this.beforeScroll) {
-          this.scroll.on('beforeScrollStart', () => {
-            this.$emit('beforeScroll')
           })
         }
       },

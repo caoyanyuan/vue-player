@@ -16,6 +16,7 @@ export function getRecommend() {
 
 export function gerDiscList() {
 	const url = '/api/getDiscList'
+ // const url='https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
 
 	const data = Object.assign({}, commonParams, {
 		platform: 'yqq',
@@ -26,7 +27,7 @@ export function gerDiscList() {
 		needNewCode: 0,
 		categoryId: 10000000,
 		rnd: Math.random(),
-		format: 'json'
+    format:'json'
 	})
 
 	return axios.get(url, {

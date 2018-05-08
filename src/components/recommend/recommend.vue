@@ -6,7 +6,7 @@
           <slider :loop="false">
             <div v-for="item in recommends">
               <a :href="item.linkUrl">
-                <img class="needsclick" :src="item.picUrl">
+                <img class="needsclick" @load="loadImage" :src="item.picUrl">
               </a>
             </div>
           </slider>
@@ -17,7 +17,7 @@
           <ul>
             <li v-for="item in discList" class="item">
               <div class="icon">
-                <img width="60" height="60">
+                <img width="60" height="60" v-lazy="item.imgurl" >
               </div>
               <div class="text">
                 <h2 class="name" v-html='item.creator.name'></h2>
@@ -27,6 +27,9 @@
           </ul>
         </div>
       </div>
+      <div class="loading-container" v-if="!discList.length">
+        <loading></loading>
+      </div>
     </scroll>
     <router-view></router-view>
   </div>
@@ -35,6 +38,7 @@
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
   import Slider from 'base/slider/slider'
+  import Loading from 'base/loading/loading'
   import {getRecommend, gerDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
 
@@ -47,10 +51,10 @@
     },
     created() {
       this._getRecommond()
-      //this._getDiscList()   获取歌单推荐接口出错，跨域设置refers不行
+      this._getDiscList()
     },
     components:{
-      Slider,Scroll
+      Slider,Scroll,Loading
     },
     methods:{
       _getRecommond(){
@@ -63,9 +67,15 @@
       _getDiscList(){
         gerDiscList().then((res) => {
           if(res.code === ERR_OK) {
-            this.recommends = res.data.slider;
+            this.discList = res.data.list;
           }
         })
+      },
+      loadImage(){
+        if(!this.checkLoad){
+          this.checkLoad = true
+          this.$refs.scroll.refresh()
+        }
       }
     }
   }

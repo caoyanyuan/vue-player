@@ -1,7 +1,7 @@
 <template>
 	<div class="slider" ref="slider">
 		<div class="slider-group" ref="sliderGroup">
-			<slot></slot>	
+			<slot></slot>
 		</div>
 		<div class="dots">
 			<span class="dot" v-for="(item, index) in dots" :class="{active: currentPageIndex === index }"></span>
@@ -17,8 +17,8 @@
 		name:'slider',
 		props:{
 			loop: {
-		        type: Boolean,
-		        default: true
+        type: Boolean,
+        default: true
 			},
 			autoPlay: {
 				type: Boolean,
@@ -38,7 +38,7 @@
 		mounted(){
 			setTimeout(() => {
 				this._setSliderWidth()
-				this._initSlider()	
+				this._initSlider()
 				this._initDots()
 
 				if(this.autoPlay){
@@ -77,7 +77,7 @@
 					width += sliderWidth
 				}
 				if(this.loop && !isResize){
-					width += 2 * sliderWidth 
+					width += 2 * sliderWidth
 				}
 				this.$refs.sliderGroup.style.width = width +"px";
 			},
