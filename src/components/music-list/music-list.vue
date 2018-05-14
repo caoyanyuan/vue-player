@@ -1,11 +1,11 @@
 <template>
   <div class="music-list">
-    <div class="back"><i class="icon-back"></i></div>
+    <div class="back" @click="back"><i class="icon-back"></i></div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage"></div>
     <scroll class="list" ref="list" :probeType="probeType" :listenScroll="listenScroll" @scroll="scroll">
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list :songs="songs" @selected = 'selectItem'></song-list>
       </div>
     </scroll>
     <div class="bg-layer" ref="bgLayer"></div>
@@ -15,8 +15,12 @@
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
   import SongList from 'base/song-list/song-list'
+  import {prefixStyle} from 'common/js/dom'
+  import {mapActions} from 'vuex'
 
   const RESERVE_HEIGHT = 40
+  const transform = prefixStyle('transform')
+  const backdrop = prefixStyle('backdrop')
 
   export default {
     props: {
@@ -48,9 +52,22 @@
       this.minTranslateY = -this.imgHeight + RESERVE_HEIGHT
     },
     methods: {
-      scroll(pos){
+      scroll(pos) {
         this.scrollY = pos.y
-      }
+      },
+      back() {
+        this.$router.back()
+      },
+      selectItem(item, index) {
+        this.selectPlay({
+          list: this.songs,
+          index
+        })
+      },
+      ...mapActions([
+        'selectPlay'
+      ])
+
     },
     watch: {
       scrollY(newY){
@@ -65,8 +82,8 @@
         } else {
           blur = Math.max(0.2, 1-percent)
         }
-        this.$refs.bgLayer.style['transform'] = `translate3d(0, ${translateY}px,0)`
-        this.$refs.bgImage.style['opacity'] = `${blur}`
+        this.$refs.bgLayer.style[transform] = `translate3d(0, ${translateY}px,0)`
+        this.$refs.bgImage.style[backdrop] = `${blur}`
         if(newY < translateY){
           this.$refs.bgImage.style.paddingTop = 0
           this.$refs.bgImage.style.height = `${RESERVE_HEIGHT}px`
@@ -75,7 +92,7 @@
           this.$refs.bgImage.style.paddingTop = '70%'
           this.$refs.bgImage.style.height = 0
         }
-        this.$refs.bgImage.style['transform'] = `scale(${scale})`
+        this.$refs.bgImage.style[transform] = `scale(${scale})`
         this.$refs.bgImage.style.zIndex = zIndex
       }
     },

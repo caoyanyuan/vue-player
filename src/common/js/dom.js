@@ -18,3 +18,35 @@ export function getData(el, attr, val){
     return el.getAttribute(prefix + attr)
   }
 }
+
+let elementStyle = document.createElement('div').style
+
+let vendor = (() => {
+  let transformNames = {
+    webkit: `webkitTransform`,
+    Moz: `mozTransform`,
+    O: `OTransform`,
+    ms: `msTransform`,
+    standard:  `transform`
+  }
+
+  for(let key in transformNames){
+    if(elementStyle[transformNames[key]] != undefined) {
+      return key
+    }
+  }
+
+  return false
+})()
+
+export function prefixStyle(style){
+  if (vendor === false){
+    return false
+  }
+
+  if (vendor === 'standard'){
+    return style
+  }
+
+  return vendor + style.charAt(0).toUpperCase() + style.substr(1)
+}

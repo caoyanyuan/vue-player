@@ -25,7 +25,7 @@
         </li>
       </ul>
     </div>
-    <div class="list-fixed" ref="fixed">
+    <div class="list-fixed" ref="fixed" v-show="fixedTitle">
       <div class="fixed-title">{{fixedTitle}}</div>
     </div>
     <div v-show="!data.length" class="loading-container">
@@ -125,7 +125,6 @@
       data(){
         setTimeout(() => {
           this._calculateHeight()
-          console.info(this.listHeight)
         },20)
       },
       scrollY(newY){
