@@ -2,7 +2,14 @@
   <div class="music-list">
     <div class="back" @click="back"><i class="icon-back"></i></div>
     <h1 class="title" v-html="title"></h1>
-    <div class="bg-image" :style="bgStyle" ref="bgImage"></div>
+    <div class="bg-image" :style="bgStyle" ref="bgImage">
+      <div class="play-wrapper">
+        <div ref="playBtn" v-show="songs.length>0" class="play" @click="random">
+          <i class="icon-play"></i>
+          <span class="text">随机播放全部</span>
+        </div>
+      </div>
+    </div>
     <scroll class="list" ref="list" :probeType="probeType" :listenScroll="listenScroll" @scroll="scroll">
       <div class="song-list-wrapper">
         <song-list :songs="songs" @selected = 'selectItem'></song-list>
@@ -52,6 +59,11 @@
       this.minTranslateY = -this.imgHeight + RESERVE_HEIGHT
     },
     methods: {
+      random() {
+        this.randomPlay({
+          list:this.songs
+        })
+      },
       scroll(pos) {
         this.scrollY = pos.y
       },
@@ -65,7 +77,8 @@
         })
       },
       ...mapActions([
-        'selectPlay'
+        'selectPlay',
+        'randomPlay'
       ])
 
     },
@@ -87,10 +100,12 @@
         if(newY < translateY){
           this.$refs.bgImage.style.paddingTop = 0
           this.$refs.bgImage.style.height = `${RESERVE_HEIGHT}px`
+          this.$refs.playBtn.style.display = 'none'
           zIndex = 10
         } else {
           this.$refs.bgImage.style.paddingTop = '70%'
           this.$refs.bgImage.style.height = 0
+          this.$refs.playBtn.style.display = 'block'
         }
         this.$refs.bgImage.style[transform] = `scale(${scale})`
         this.$refs.bgImage.style.zIndex = zIndex
