@@ -17,16 +17,34 @@
           <h1 class="title" v-html="currentSong.name"></h1>
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
-        <div class="middle">
-          <div class="middle-l">
+        <div class="middle" ref=""
+             @touchstart.prevent="middleTouchStart"
+             @touchmove.prevent="middleTouchMove"
+             @touchend.prevent="middleTouchEnd"
+        >
+          <div class="middle-l" ref = 'middleL'>
             <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd">
                 <img :src="currentSong.image" class="image">
               </div>
             </div>
           </div>
+          <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p ref="lyricLine"
+                   class="text"
+                   :class="{'current': currentLineNum === index}"
+                   v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
+              </div>
+            </div>
+          </scroll>
         </div>
         <div class="bottom">
+          <div class="dot-wrapper">
+            <span class="dot" :class="{'active':currentShow==='cd'}"></span>
+            <span class="dot" :class="{'active':currentShow==='ly'}"></span>
+          </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
@@ -71,7 +89,7 @@
         </div>
       </div>
     </transition>
-    <audio src="http://dl.stream.qqmusic.qq.com/C400003aAYrm3GE0Ac.m4a?guid=9363955531&vkey=961DA5811E58A07F9276ECFAAC4B9732BAD44F289977BBAF766A707E62C1614AE419541E4226C312A6E00A37047CABA4D00BD47634EC0E27&uin=0&fromtag=38"
+    <audio src="http://dl.stream.qqmusic.qq.com/C40000Ac.m4a?guid=19759624&vkey=F40B75243DA094661F143A7F69D52E5CD9DE450638CEA5808486DC502F367A954C9A9472EE8258CD2AC64D576B31E822E94661F65848C1A0&uin=0&fromtag=38"
            ref="audio" @play="ready" @timeupdate="updateTime" @ended = 'end'></audio>
   </div>
 </template>
@@ -84,8 +102,11 @@
   import {prefixStyle} from 'common/js/dom'
   import {playMode} from 'common/js/config'
   import {shuffle} from 'common/js/util'
+  import Lyric from 'lyric-parser'
+  import Scroll from 'base/scroll/scroll'
 
   const transform = prefixStyle('transform')
+  const transitionDuration = prefixStyle('transitionDuration')
 
   export default {
     data(){
@@ -94,9 +115,63 @@
         currentTime: '',
         percent: 0,
         radius: 32,
+        currentLyric:[],
+        currentLineNum:0,
+        currentShow:'cd'
       }
     },
+    created() {
+      this.touch = {}
+    },
     methods: {
+      middleTouchStart(e) {
+        let touch = e.touches[0]
+        this.touch.startX = touch.pageX
+        this.touch.startY = touch.pageY
+      },
+      middleTouchMove(e) {
+        let touch = e.touches[0]
+        let deltaX = touch.pageX - this.touch.startX
+        let deltaY = touch.pageY - this.touch.startY
+        if(Math.abs(deltaY) > Math.abs(deltaX)){
+          return
+        }
+        let left = this.currentShow === 'cd' ? 0 : - window.innerWidth
+        const offsetWidth = Math.max(- window.innerWidth, left + deltaX)
+        this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
+        let opacity = 1 - this.touch.percent
+        this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+        this.$refs.lyricList.$el.style[transitionDuration] = 0
+        this.$refs.middleL.style.opacity = opacity
+        this.$refs.middleL.style[transitionDuration] = 0
+      },
+      middleTouchEnd() {
+        let offsetWidth
+        let opacity
+        if(this.currentShow === 'cd'){
+          if(this.touch.percent > 0.1){
+            offsetWidth = -window.innerWidth
+            opacity = 0
+            this.currentShow = 'ly'
+          }else{
+            offsetWidth = 0
+            opacity = 1
+          }
+        }else{
+          if(this.touch.percent > 0.1){
+            offsetWidth = 0
+            opacity = 1
+            this.currentShow = 'cd'
+          }else{
+            offsetWidth = -window.innerWidth
+            opacity = 0
+          }
+        }
+        this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+        this.$refs.lyricList.$el.style[transitionDuration] = '300ms'
+        this.$refs.middleL.style.opacity = opacity
+        this.$refs.middleL.style[transitionDuration] = '300ms'
+      },
       changeMode() {
         let mode = (this.mode + 1) % 3
         this.setPlayMode(mode)
@@ -152,6 +227,24 @@
         let minutes = inter / 60 | 0
         let seconds = this._pad(inter % 60)
         return minutes + ':' + seconds
+      },
+      getLyric() {
+        this.currentSong.getLyric().then((lyric) => {
+          this.currentLyric = new Lyric(lyric, this.handleLyric)
+          if(this.playing){
+            this.currentLyric.play()
+          }
+        }).catch(() => {
+
+        })
+      },
+      handleLyric({lineNum, txt}) {
+        this.currentLineNum = lineNum
+        if(lineNum > 5){
+          this.$refs.lyricList.scrollToElement(this.$refs.lyricLine[lineNum - 5],0,1000)
+        }else{
+          this.$refs.lyricList.scrollTo(0, 0, 1000)
+        }
       },
       _pad(num, n=2) {
         let len = num.toString().length
@@ -234,6 +327,7 @@
         }
         setTimeout(() => {
           this.$refs.audio.play()
+          this.getLyric()
         },1000)
       },
       playing(newPlaying){
@@ -265,7 +359,8 @@
     },
     components: {
       ProgressBar,
-      ProgressCircle
+      ProgressCircle,
+      Scroll
     }
   }
 </script>

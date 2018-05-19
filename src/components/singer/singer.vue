@@ -22,7 +22,6 @@
       }
     },
     created(){
-      console.info(this.$router)
       this._getSinger()
     },
     methods:{
