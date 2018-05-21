@@ -325,6 +325,9 @@
         if(!newSong.id || newSong.id == oldSong.id){
           return
         }
+        if(this.currentLyric){
+          this.currentLyric.stop()
+        }
         setTimeout(() => {
           this.$refs.audio.play()
           this.getLyric()
