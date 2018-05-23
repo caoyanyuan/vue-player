@@ -28,6 +28,9 @@
                 <img :src="currentSong.image" class="image">
               </div>
             </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
             <div class="lyric-wrapper">
@@ -117,7 +120,8 @@
         radius: 32,
         currentLyric:[],
         currentLineNum:0,
-        currentShow:'cd'
+        currentShow:'cd',
+        playingLyric:null
       }
     },
     created() {
@@ -193,6 +197,12 @@
       changePercent(percent){
         let currentTime = this.currentSong.duration * percent
         this.$refs.audio.currentTime = currentTime
+        if(!this.playing) {
+          this.togglePlay()
+        }
+        if(this.currentLyric) {
+          this.currentLyric.seek(currentTime * 1000)
+        }
       },
       prev() {
         let _index = this.currentIndex
@@ -200,6 +210,9 @@
         this.setCurrentIndex(_index)
       },
       next() {
+        if(this.list.length === 1){
+          this.loop()
+        }
         let _index = this.currentIndex
         _index = _index >= this.playlist.length - 1 ?  0 : _index + 1
         this.setCurrentIndex(_index)
@@ -214,9 +227,15 @@
       _loop() {
         this.$refs.audio.currentTime = 0
         this.$refs.audio.play()
+        if(this.currentLyric) {
+          this.currentLyric.seek(0)
+        }
       },
       togglePlaying() {
         this.setPlayingState(!this.playing)
+        if(this.currentLyric){
+          this.currentLyric.togglePlay()
+        }
       },
       updateTime(e) {
         this.currentTime = e.target.currentTime
@@ -235,7 +254,9 @@
             this.currentLyric.play()
           }
         }).catch(() => {
-
+          this.currentLyric = null
+          this.playingLyric = null
+          this.currentLineNum = null
         })
       },
       handleLyric({lineNum, txt}) {
@@ -245,6 +266,7 @@
         }else{
           this.$refs.lyricList.scrollTo(0, 0, 1000)
         }
+        this.playingLyric = txt
       },
       _pad(num, n=2) {
         let len = num.toString().length
@@ -325,8 +347,10 @@
         if(!newSong.id || newSong.id == oldSong.id){
           return
         }
+
         if(this.currentLyric){
-          this.currentLyric.stop()
+          console.info(this.currentLyric)
+          //this.currentLyric.stop()
         }
         setTimeout(() => {
           this.$refs.audio.play()
