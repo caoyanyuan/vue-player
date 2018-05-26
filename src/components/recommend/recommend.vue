@@ -41,9 +41,10 @@
   import Loading from 'base/loading/loading'
   import {getRecommend, gerDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
+  import {playlistMixin} from "common/js/mixins";
 
   export default {
-    
+    mixins: [playlistMixin],
     data(){
       return {
         recommends: [],
@@ -58,6 +59,11 @@
       Slider,Scroll,Loading
     },
     methods:{
+      handlePlaylist(playlist) {
+        var bottom = playlist.length > 0 ? '60px' : '0'
+        this.$refs.recommend.style.bottom = bottom
+        this.$refs.scroll.refresh()
+      },
       _getRecommond(){
         getRecommend().then((res) => {
           if(res.code === ERR_OK) {

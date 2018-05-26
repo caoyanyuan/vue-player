@@ -1,5 +1,5 @@
 <template>
-  <div class="music-list">
+  <div class="music-list" ref="musiclist">
     <div class="back" @click="back"><i class="icon-back"></i></div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
@@ -23,6 +23,7 @@
   import Scroll from 'base/scroll/scroll'
   import SongList from 'base/song-list/song-list'
   import {prefixStyle} from 'common/js/dom'
+  import {playlistMixin} from  'common/js/mixins'
   import {mapActions} from 'vuex'
 
   const RESERVE_HEIGHT = 40
@@ -30,6 +31,7 @@
   const backdrop = prefixStyle('backdrop')
 
   export default {
+    mixins: [playlistMixin],
     props: {
       title: {
         type: String,
@@ -59,6 +61,11 @@
       this.minTranslateY = -this.imgHeight + RESERVE_HEIGHT
     },
     methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : '0px'
+        this.$refs.list.$el.style.bottom = bottom
+        this.$refs.list.refresh()
+      },
       random() {
         this.randomPlay({
           list:this.songs
