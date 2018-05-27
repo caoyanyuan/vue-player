@@ -48,10 +48,11 @@
         this.$refs.toplist.refresh()
       },
       selectItem(item) {
+        this.setTopList(item)
         this.$router.push({
           path: `/rank/${item.id}`
         })
-        this.setTopList(item)
+
       },
       _getTopList() {
         getTopList().then((res) => {

@@ -9,6 +9,6 @@ const state = {
   mode: playMode.sequence,
   currentIndex: -1,
   sheet: {},
-  topList: []
+  topList: {}
 }
 export default state

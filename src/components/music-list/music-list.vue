@@ -12,7 +12,7 @@
     </div>
     <scroll class="list" ref="list" :probeType="probeType" :listenScroll="listenScroll" @scroll="scroll">
       <div class="song-list-wrapper">
-        <song-list :songs="songs" @selected = 'selectItem'></song-list>
+        <song-list :songs="songs" @selected = 'selectItem' :rank="rank"></song-list>
       </div>
     </scroll>
     <div class="bg-layer" ref="bgLayer"></div>
@@ -44,11 +44,15 @@
       songs: {
         type: Array,
         default: []
+      },
+      rank: {
+        type:Boolean,
+        default:false
       }
     },
     data() {
       return {
-        scrollY: 0
+        scrollY: 0,
       }
     },
     created() {

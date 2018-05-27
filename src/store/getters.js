@@ -18,4 +18,4 @@ export const currentSong = (state) => {
 
 export const sheet = state => state.sheet
 
-export const topList = state => state.toplist
+export const topList = state => state.topList
