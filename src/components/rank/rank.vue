@@ -1,67 +1,123 @@
 <template>
-  <div id="Linkage">
-    <template v-for="(categories,index) in categoryLevels">
-      <select v-model="categoryValues[index]" :key="index" @change="selectedCategory(index)" ref="select">
-        <template v-for="(category, k) in categories" >
-          <option :value="category" v-text="category.name" :key="k"></option>
-        </template>
-      </select>
-    </template>
-    <br/>
-    <button @click="change">click me</button>
+  <div class="rank" ref="rank">
+    <scroll :data="topList" class="toplist" ref="toplist">
+      <ul>
+        <li @click="selectItem(item)" class="item" v-for="item in topList">
+          <div class="icon">
+            <img width="100" height="100" v-lazy="item.picUrl"/>
+          </div>
+          <ul class="songlist">
+            <li class="song" v-for="(song,index) in item.songList">
+              <span>{{index + 1}}</span>
+              <span>{{song.songname}}-{{song.singername}}</span>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <div class="loading-container" v-show="!topList.length">
+        <loading></loading>
+      </div>
+    </scroll>
+    <router-view></router-view>
   </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
+  import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
+  import {getTopList} from 'api/rank'
+  import {ERR_OK} from 'api/config'
+  import {playlistMixin} from 'common/js/mixins'
+  import {mapMutations} from 'vuex'
+
   export default {
-    data: function () {
+    mixins: [playlistMixin],
+    created() {
+      this._getTopList()
+    },
+    data() {
       return {
-        categoryData: null,
-        categoryLevels: [],
-        categoryValues: [],
-        curCate:182
-      }
-    },
-    mounted () {
-      this.init()
-    },
-    watch: {
-      categoryData (value) {
-        this.categoryLevels.push(value.filter(category => category.parent_id === 0))
+        topList: []
       }
     },
     methods: {
-      init () {
-        this.categoryData = [
-          {type_id: 1, parent_id: 0, name: '一级分类'},
-          {type_id: 12, parent_id: 1, name: '二级分类1'},
-          {type_id: 13, parent_id: 1, name: '二级分类2'},
-          {type_id: 122, parent_id: 12, name: '三级分类1'},
-          {type_id: 133, parent_id: 13, name: '三级分类2'},
-          {type_id: 1335, parent_id: 133, name: '三级分类2'},
-          {type_id: 1336, parent_id: 133, name: '三级分类2'},
-        ]
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+
+        this.$refs.rank.style.bottom = bottom
+        this.$refs.toplist.refresh()
       },
-      selectedCategory (index) {
-        this.curCate = this.$refs.select[0].value;
-        this.categoryLevels.splice(index + 1, this.categoryLevels.length)
-        this.categoryValues.splice(index + 1, this.categoryValues.length)
-        this.categoryValues.forEach((selectedCategory, index) => {
-          let categories = this.categoryData.filter(category => category.parent_id === selectedCategory.type_id)
-          if (categories.length) {
-            this.categoryLevels[index + 1] = categories
+      selectItem(item) {
+        this.$router.push({
+          path: `/rank/${item.id}`
+        })
+        this.setTopList(item)
+      },
+      _getTopList() {
+        getTopList().then((res) => {
+          if (res.code === ERR_OK) {
+            this.topList = res.data.topList
           }
         })
-        console.info(this.categoryLevels)
       },
-      change() {
-        let _index = this.curCate
-        console.info(_index)
+      ...mapMutations({
+        setTopList: 'SET_TOP_LIST'
+      })
+    },
+    watch: {
+      topList() {
+        setTimeout(() => {
+          this.$Lazyload.lazyLoadHandler()
+        }, 20)
       }
+    },
+    components: {
+      Scroll,
+      Loading
     }
   }
 </script>
 
-<style scoped>
+<style scoped lang="stylus" rel="stylesheet/stylus">
+  @import "~common/stylus/variable"
+  @import "~common/stylus/mixin"
 
+  .rank
+    position: fixed
+    width: 100%
+    top: 88px
+    bottom: 0
+    .toplist
+      height: 100%
+      overflow: hidden
+      .item
+        display: flex
+        margin: 0 20px
+        padding-top: 20px
+        height: 100px
+        &:last-child
+          padding-bottom: 20px
+        .icon
+          flex: 0 0 100px
+          width: 100px
+          height: 100px
+        .songlist
+          flex: 1
+          display: flex
+          flex-direction: column
+          justify-content: center
+          padding: 0 20px
+          height: 100px
+          overflow: hidden
+          background: $color-highlight-background
+          color: $color-text-d
+          font-size: $font-size-small
+          .song
+            no-wrap()
+            line-height: 26px
+      .loading-container
+        position: absolute
+        width: 100%
+        top: 50%
+        transform: translateY(-50%)
 </style>

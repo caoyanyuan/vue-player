@@ -24,6 +24,9 @@ const mutations = {
   },
   [types.SET_SHEET](state, sheet){
     state.sheet= sheet
+  },
+  [types.SET_TOP_LIST](state, toplist){
+    state.topList = toplist
   }
 }
 

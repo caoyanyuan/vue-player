@@ -14,3 +14,5 @@ export const SET_CURRENT_INDEX = 'SET_CURRENT_INDEX'
 
 export const SET_SHEET= 'SET_SHEET'
 
+export const SET_TOP_LIST = 'SET_TOP_LIST'
+
