@@ -32,6 +32,7 @@
       ])
     },
     created(){
+      console.info(this.singer)
       this._getDetail();
     },
     methods:{

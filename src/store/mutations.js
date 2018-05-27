@@ -21,6 +21,9 @@ const mutations = {
   },
   [types.SET_CURRENT_INDEX](state, index){
     state.currentIndex = index
+  },
+  [types.SET_SHEET](state, sheet){
+    state.sheet= sheet
   }
 }
 

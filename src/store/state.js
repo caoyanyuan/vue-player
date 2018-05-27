@@ -7,6 +7,7 @@ const state = {
   playlist: [],
   sequenceList: [],
   mode: playMode.sequence,
-  currentIndex: -1
+  currentIndex: -1,
+  sheet: {}
 }
 export default state
