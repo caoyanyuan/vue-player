@@ -8,7 +8,7 @@
 <script>
   import MusicList from 'components/music-list/music-list'
   import {getSongList} from 'api/recommend'
-  import ERR_OK from 'api/config'
+  import {ERR_OK} from 'api/config'
   import {mapGetters} from 'vuex'
 
   export default {

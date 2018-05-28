@@ -54,12 +54,6 @@
 				this.slider.refresh();
 			})
 		},
-		activated(){
-
-		},
-		deactivated(){
-
-		},
 		beforeDestroy(){
 			clearTimeout(this.timer)
 		},
@@ -83,14 +77,14 @@
 			},
 			_initSlider() {
 				this.slider = new BScroll(this.$refs.slider, {
-			          scrollX: true,
-			          scrollY: false,
-			          momentum: false,
-			          snap: true,
-			          snapLoop: false,
-			          snapThreshold: 0.3,
-			          snapSpeed: 400
-			        })
+          scrollX: true,
+          scrollY: false,
+          momentum: false,
+          snap: true,
+          snapLoop: false,
+          snapThreshold: 0.3,
+          snapSpeed: 400
+        })
 
 				this.slider.on('scrollEnd', () => {
 					let pageIndex = this.slider.getCurrentPage().pageX;
