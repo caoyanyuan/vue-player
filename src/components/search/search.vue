@@ -13,10 +13,14 @@
         </div>
       </div>
     </div>
+    <div class="search-result" v-show="query">
+      <suggest :query="query"></suggest>
+    </div>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+  import Suggest from 'components/suggest/suggest'
   import SearchBox from 'base/search-box/search-box'
   import {getHotKey,search} from 'api/search'
 
@@ -38,13 +42,13 @@
       }
     },
     watch: {
-      
+
     },
     mounted() {
       this._getHotKey()
     },
     components:{
-      SearchBox
+      SearchBox, Suggest
     }
   }
 
