@@ -1,5 +1,5 @@
 <template>
-  <scroll class="suggest" :data="result">
+  <scroll class="suggest" :data="result" :pullup=true @scrollToEnd="searchMore">
     <ul class="suggest-list">
       <li class="suggest-item" v-for="item in result">
         <div class="icon"><i :class="getIconCls(item)"></i></div>
@@ -7,6 +7,7 @@
           <p class="text" v-text="getDisplayName(item)"></p>
         </div>
       </li>
+      <loading v-show="hasMore" title=""></loading>
     </ul>
   </scroll>
 </template>
@@ -16,6 +17,7 @@
   import {createSong} from 'common/js/song'
   import {search} from 'api/search'
   import {ERR_OK} from 'api/config'
+  import Loading from 'base/loading/loading'
 
   const perpage = 20
   const TYPE_SINGER = 'singer'
@@ -34,17 +36,37 @@
     data() {
       return {
         page: 1,
-        result: []
+        result: [],
+        hasMore: true
       }
     },
     methods: {
+      searchMore(){
+        if(!this.hasMore) {
+         return
+        }
+        this.page++
+        this.search(this.query)
+      },
+      searchFirst(){
+        this.page = 1
+        this.result = []
+        this.hasMore = true
+        this.search(this.query)
+      },
       search(query) {
         search(query, this.page, this.showSinger, perpage).then((res) => {
           if(res.code === ERR_OK){
-            this.result = this._getResult(res.data)
+            this.result = this.result.concat(this._getResult(res.data))
+            this._checkMored(res.data)
           }
         })
-
+      },
+      _checkMored(data) {
+        const song = data.song
+        if (!song.list.length || (song.curnum + song.curpage * perpage) >= song.totalnum) {
+          this.hasMore = false
+        }
       },
       getIconCls(item){
         if(item.type === TYPE_SINGER){
@@ -82,11 +104,11 @@
     },
     watch: {
       query(newQuery){
-        this.search(newQuery)
+        this.searchFirst(newQuery)
       }
     },
     components:{
-      Scroll
+      Scroll, Loading
     }
   }
 </script>
