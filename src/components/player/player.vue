@@ -210,8 +210,8 @@
         this.setCurrentIndex(_index)
       },
       next() {
-        if(this.list.length === 1){
-          this.loop()
+        if(this.playlist.length === 1){
+          this._loop()
         }
         let _index = this.currentIndex
         _index = _index >= this.playlist.length - 1 ?  0 : _index + 1

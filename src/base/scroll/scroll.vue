@@ -41,7 +41,7 @@
         type: Number,
         default: 20
       },
-      pullup: {
+      pullup: {                       //上拉加载
         type: Boolean,
         default: false
       }
