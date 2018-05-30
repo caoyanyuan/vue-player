@@ -16,3 +16,4 @@ export const SET_SHEET= 'SET_SHEET'
 
 export const SET_TOP_LIST = 'SET_TOP_LIST'
 
+export const SET_SEARCH_HISTORY = 'SET_SEARCH_HISTORY'
