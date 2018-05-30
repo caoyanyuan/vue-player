@@ -11,20 +11,31 @@
             <li class="item" v-for="item in hotKey"><span>{{item.k}}</span></li>
           </ul>
         </div>
+        <div class="search-history" v-show="searchHistory.length">
+          <h1 class="title">
+            <span class="text">搜索历史</span>
+            <!--<span @click="showConfirm" class="clear">
+                <i class="icon-clear"></i>
+              </span>-->
+          </h1>
+          <history-list :searches="searchHistory" @delete="deleteSearchHistory"></history-list>
+        </div>
       </div>
     </div>
     <div class="search-result" v-show="query">
       <suggest :query="query" @select="saveSearch"></suggest>
     </div>
+
     <router-view></router-view>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+  import HistoryList from 'base/history-list/history-list'
   import Suggest from 'components/suggest/suggest'
   import SearchBox from 'base/search-box/search-box'
   import {getHotKey,search} from 'api/search'
-  import {mapActions} from 'vuex'
+  import {mapActions, mapGetters} from 'vuex'
 
   export default {
     data() {
@@ -37,6 +48,7 @@
       saveSearch() {
         this.saveSearchHistory(this.query)
       },
+
       onQueryChange(query) {
         this.query = query
       },
@@ -46,17 +58,20 @@
         })
       },
       ...mapActions([
-        'saveSearchHistory'
+        'saveSearchHistory',
+        'deleteSearchHistory'
       ])
     },
-    watch: {
-
+    computed: {
+      ...mapGetters([
+        'searchHistory'
+      ])
     },
     mounted() {
       this._getHotKey()
     },
     components:{
-      SearchBox, Suggest
+      SearchBox, Suggest, HistoryList
     }
   }
 
