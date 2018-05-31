@@ -79,11 +79,11 @@
         search(query, this.page, this.showSinger, perpage).then((res) => {
           if(res.code === ERR_OK){
             this.result = this.result.concat(this._getResult(res.data))
-            this._checkMored(res.data)
+            this._checkMore(res.data)
           }
         })
       },
-      _checkMored(data) {
+      _checkMore(data) {
         const song = data.song
         if (!song.list.length || (song.curnum + song.curpage * perpage) >= song.totalnum) {
           this.hasMore = false
