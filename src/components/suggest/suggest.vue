@@ -1,5 +1,11 @@
 <template>
-  <scroll class="suggest" :data="result" :pullup=true @scrollToEnd="searchMore">
+  <scroll class="suggest"
+          :data="result"
+          :pullup=true
+          :beforeScroll="beforeScroll"
+          @beforeScroll="listScroll"
+          @scrollToEnd="searchMore"
+          ref="suggest">
     <ul class="suggest-list">
       <li class="suggest-item" v-for="item in result" @click="selectItem(item)">
         <div class="icon"><i :class="getIconCls(item)"></i></div>
@@ -43,10 +49,14 @@
       return {
         page: 1,
         result: [],
-        hasMore: true
+        hasMore: true,
+        beforeScroll: true
       }
     },
     methods: {
+      refresh() {
+        this.$refs.suggest.refresh()
+      },
       selectItem(item){
         if(item.type === TYPE_SINGER) {
           const singer = new Singer({
@@ -68,6 +78,9 @@
         }
         this.page++
         this.search(this.query)
+      },
+      listScroll() {
+        this.$emit('listScroll')
       },
       searchFirst(){
         this.page = 1
