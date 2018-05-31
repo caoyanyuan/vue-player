@@ -23,6 +23,9 @@
     methods: {
       deleteOne(item){
         this.$emit('delete',item)
+      },
+      selectItem(item){
+        this.$emit('select', item)
       }
     }
   }

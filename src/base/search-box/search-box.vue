@@ -24,6 +24,9 @@
       clear() {
         this.query = ""
       },
+      addQuery(query) {
+        this.query = query
+      }
     },
     watch: {
       query(newQuery) {

@@ -1,14 +1,14 @@
 <template>
   <div class="search">
     <div class="search-box-wrapper">
-      <search-box @query="onQueryChange"></search-box>
+      <search-box @query="onQueryChange" ref="searchBox"></search-box>
     </div>
     <div class="shortcut-wrapper" ref="shortcut-wrapper" v-show="!query">
       <div class="shortcut">
         <div class="hot-key">
           <h1 class="title">热门搜索</h1>
           <ul>
-            <li class="item" v-for="item in hotKey"><span>{{item.k}}</span></li>
+            <li class="item" v-for="item in hotKey" @click="addQuery(item.k)"><span>{{item.k}}</span></li>
           </ul>
         </div>
         <div class="search-history" v-show="searchHistory.length">
@@ -18,7 +18,7 @@
                 <i class="icon-clear"></i>
               </span>
           </h1>
-          <history-list :searches="searchHistory" @delete="deleteSearchHistory"></history-list>
+          <history-list :searches="searchHistory" @delete="deleteSearchHistory" @select="addQuery"></history-list>
         </div>
       </div>
     </div>
@@ -51,6 +51,9 @@
       },
       saveSearch() {
         this.saveSearchHistory(this.query)
+      },
+      addQuery(item){
+        this.$refs.searchBox.addQuery(item)
       },
       onQueryChange(query) {
         this.query = query
