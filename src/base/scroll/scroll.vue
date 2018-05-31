@@ -12,7 +12,7 @@
       /** probeType:
        *  * 1 滚动的时候会派发scroll事件，会截流。
        *  * 2 滚动的时候实时派发scroll事件，不会截流。
-       *  * 3 除了实时派发scroll事件，在swipe的情况下仍然能实时派发scroll事件 */
+       *  * 3 除了实时派发scroll事件，在滑动的情况下仍然能实时派发scroll事件 */
       probeType: {
         type: Number,
         default: 1

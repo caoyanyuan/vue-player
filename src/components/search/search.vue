@@ -14,9 +14,9 @@
         <div class="search-history" v-show="searchHistory.length">
           <h1 class="title">
             <span class="text">搜索历史</span>
-            <!--<span @click="showConfirm" class="clear">
+              <span @click="showConfirm" class="clear">
                 <i class="icon-clear"></i>
-              </span>-->
+              </span>
           </h1>
           <history-list :searches="searchHistory" @delete="deleteSearchHistory"></history-list>
         </div>
@@ -25,12 +25,13 @@
     <div class="search-result" v-show="query">
       <suggest :query="query" @select="saveSearch"></suggest>
     </div>
-
+    <confirm text="确定删除全部历史吗？" ref="confirm" @confirm="clearSearchHistory"></confirm>
     <router-view></router-view>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+  import Confirm from 'base/confirm/confirm'
   import HistoryList from 'base/history-list/history-list'
   import Suggest from 'components/suggest/suggest'
   import SearchBox from 'base/search-box/search-box'
@@ -45,10 +46,12 @@
       }
     },
     methods: {
+      showConfirm() {
+        this.$refs.confirm.show()
+      },
       saveSearch() {
         this.saveSearchHistory(this.query)
       },
-
       onQueryChange(query) {
         this.query = query
       },
@@ -59,7 +62,8 @@
       },
       ...mapActions([
         'saveSearchHistory',
-        'deleteSearchHistory'
+        'deleteSearchHistory',
+        'clearSearchHistory'
       ])
     },
     computed: {
@@ -71,7 +75,7 @@
       this._getHotKey()
     },
     components:{
-      SearchBox, Suggest, HistoryList
+      SearchBox, Suggest, HistoryList, Confirm
     }
   }
 
