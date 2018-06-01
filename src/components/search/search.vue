@@ -69,7 +69,7 @@
       saveSearch() {
         this.saveSearchHistory(this.query)
       },
-      addQuery(item) {
+      addQuery(item){
         this.$refs.searchBox.addQuery(item)
       },
       onQueryChange(query) {
