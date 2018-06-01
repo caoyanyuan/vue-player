@@ -90,14 +90,19 @@
             <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
         </div>
+        <div class="control">
+          <i class="icon-playlist" @click.stop="showPlaylist"></i>
+        </div>
       </div>
     </transition>
+    <play-list ref="playList"></play-list>
     <audio src="http://dl.stream.qqmusic.qq.com/C40000Ac.m4a?guid=19759624&vkey=F40B75243DA094661F143A7F69D52E5CD9DE450638CEA5808486DC502F367A954C9A9472EE8258CD2AC64D576B31E822E94661F65848C1A0&uin=0&fromtag=38"
            ref="audio" @play="ready" @timeupdate="updateTime" @ended = 'end'></audio>
   </div>
 </template>
 
 <script>
+  import PlayList from 'components/playlist/playlist'
   import ProgressCircle from 'base/progress-circle/progress-circle'
   import ProgressBar from 'base/progress-bar/progress-bar'
   import {mapGetters, mapMutations} from 'vuex'
@@ -128,6 +133,9 @@
       this.touch = {}
     },
     methods: {
+      showPlaylist() {
+        this.$refs.playList.show()
+      },
       middleTouchStart(e) {
         let touch = e.touches[0]
         this.touch.startX = touch.pageX
@@ -348,9 +356,11 @@
           return
         }
 
-        if(this.currentLyric){
-          console.info(this.currentLyric)
-          //this.currentLyric.stop()
+        if(this.currentLyric.length>0){
+          this.currentLyric.stop()
+          this.currentTime = 0
+          this.playingLyric = ''
+          this.currentLineNum = 0
         }
         setTimeout(() => {
           this.$refs.audio.play()
@@ -387,7 +397,8 @@
     components: {
       ProgressBar,
       ProgressCircle,
-      Scroll
+      Scroll,
+      PlayList
     }
   }
 </script>
