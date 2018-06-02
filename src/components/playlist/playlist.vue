@@ -3,9 +3,9 @@
     <div class="playlist" @click="hide" v-show="showFlag">
       <div class="list-wrapper">
         <div class="list-header">
-          <h1 class="title">
-            <i class="icon"></i>
-            <span class="text">顺序播放</span>
+          <h1 class="title" @click.stop="changeMode">
+            <i class="icon" :class="iconMode"></i>
+            <span class="text">{{iconModeText}}</span>
             <span class="clear" @click.stop="confirmClear"><i class="icon-clear"></i></span>
           </h1>
         </div>
@@ -45,20 +45,14 @@
   import Scroll from 'base/scroll/scroll'
   import {playMode} from 'common/js/config'
   import {mapGetters, mapMutations, mapActions} from 'vuex'
+  import {playerMixin} from "common/js/mixins"
 
   export default {
+    mixins: [playerMixin],
     data() {
       return {
         showFlag: false
       }
-    },
-    computed: {
-      ...mapGetters([
-        'sequenceList',
-        'currentSong',
-        'mode',
-        'playlist'
-      ])
     },
     methods: {
       addSong() {
@@ -108,6 +102,11 @@
         'deleteSong',
         'deleteAllSong'
       ])
+    },
+    computed: {
+      iconModeText() {
+        return this.mode == playMode.sequence ? '顺序播放' : this.mode == playMode.loop ? '循环播放' : '随机播放'
+      }
     },
     watch: {
       currentSong(newSong, oldSong) {

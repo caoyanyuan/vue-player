@@ -26,7 +26,6 @@ export const playlistMixin = {
   }
 }
 
-
 export const searchMixin = {
   data() {
     return {
@@ -59,7 +58,43 @@ export const searchMixin = {
   }
 }
 
-
+export const playerMixin = {
+  computed: {
+    iconMode() {
+      return this.mode == playMode.sequence ? 'icon-sequence' : this.mode == playMode.loop ? 'icon-loop' : 'icon-random'
+    },
+    ...mapGetters([
+      'mode',
+      'sequenceList',
+      'currentSong',
+      'playlist'
+    ])
+  },
+  methods: {
+    changeMode() {
+      let mode = (this.mode + 1) % 3
+      this.setPlayMode(mode)
+      let list = ""
+      if(mode == playMode.random) {
+        list = shuffle(this.sequenceList)
+      }else{
+        list = this.sequenceList
+      }
+      this._resetCurrentIndex(list)
+      this.setPlayList(list)
+    },
+    _resetCurrentIndex(list) {
+      let index = list.findIndex((item) => {
+        return item.id == this.currentSong.id
+      })
+      this.setCurrentIndex(index)
+    },
+    ...mapMutations({
+      setPlayMode: 'SET_PLAY_MODE',
+      setPlayList: 'SET_PLAYLIST'
+    })
+  }
+}
 
 
 

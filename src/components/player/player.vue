@@ -112,11 +112,13 @@
   import {shuffle} from 'common/js/util'
   import Lyric from 'lyric-parser'
   import Scroll from 'base/scroll/scroll'
+  import {playerMixin} from "common/js/mixins"
 
   const transform = prefixStyle('transform')
   const transitionDuration = prefixStyle('transitionDuration')
 
   export default {
+    mixins: [playerMixin],
     data(){
       return {
         songReady: false,
@@ -183,24 +185,6 @@
         this.$refs.lyricList.$el.style[transitionDuration] = '300ms'
         this.$refs.middleL.style.opacity = opacity
         this.$refs.middleL.style[transitionDuration] = '300ms'
-      },
-      changeMode() {
-        let mode = (this.mode + 1) % 3
-        this.setPlayMode(mode)
-        let list = ""
-        if(mode == playMode.random) {
-          list = shuffle(this.sequenceList)
-        }else{
-          list = this.sequenceList
-        }
-        this._resetCurrentIndex(list)
-        this.setPlayList(list)
-      },
-      _resetCurrentIndex(list) {
-        let index = list.findIndex((item) => {
-          return item.id == this.currentSong.id
-        })
-        this.setCurrentIndex(index)
       },
       changePercent(percent){
         let currentTime = this.currentSong.duration * percent
@@ -345,9 +329,7 @@
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',
         setPlayingState: 'SET_PLAYING_STATE',
-        setCurrentIndex: 'SET_CURRENT_INDEX',
-        setPlayMode: 'SET_PLAY_MODE',
-        setPlayList: 'SET_PLAYLIST'
+        setCurrentIndex: 'SET_CURRENT_INDEX'
       })
     },
     watch: {
@@ -385,13 +367,9 @@
         return this.playing ? 'icon-pause' : 'icon-play'
       },
       ...mapGetters([
-        'playlist',
-        'sequenceList',
         'currentIndex',
-        'currentSong',
         'fullScreen',
         'playing',
-        'mode'
       ])
     },
     components: {
