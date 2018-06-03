@@ -21,3 +21,5 @@ export const sheet = state => state.sheet
 export const topList = state => state.topList
 
 export const searchHistory = state => state.searchHistory
+
+export const playHistory = state => state.playHistory

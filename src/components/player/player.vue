@@ -105,7 +105,7 @@
   import PlayList from 'components/playlist/playlist'
   import ProgressCircle from 'base/progress-circle/progress-circle'
   import ProgressBar from 'base/progress-bar/progress-bar'
-  import {mapGetters, mapMutations} from 'vuex'
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import {playMode} from 'common/js/config'
@@ -330,14 +330,17 @@
         setFullScreen: 'SET_FULL_SCREEN',
         setPlayingState: 'SET_PLAYING_STATE',
         setCurrentIndex: 'SET_CURRENT_INDEX'
-      })
+      }),
+      ...mapActions([
+        'savePlaySong'
+      ])
     },
     watch: {
       currentSong(newSong ,oldSong) {
         if(!newSong.id || newSong.id == oldSong.id){
           return
         }
-
+        this.savePlaySong(newSong)
         if(this.currentLyric.length>0){
           this.currentLyric.stop()
           this.currentTime = 0
@@ -345,7 +348,7 @@
           this.currentLineNum = 0
         }
         setTimeout(() => {
-          this.$refs.audio.play()
+          //this.$refs.audio.play()
           this.getLyric()
         },1000)
       },
@@ -369,7 +372,7 @@
       ...mapGetters([
         'currentIndex',
         'fullScreen',
-        'playing',
+        'playing'
       ])
     },
     components: {
