@@ -23,14 +23,15 @@
           </div>
         </scroll>
       </div>
-     <!-- <div class="no-result-wrapper" v-show="noResult">
+     <div class="no-result-wrapper" v-show="noResult">
         <no-result :title="noResultDesc"></no-result>
-      </div>-->
+      </div>
     </div>
   </transition>
 </template>
 
 <script type="text/ecmascript-6">
+  import NoResult from 'base/no-result/no-result'
   import SongList from 'base/song-list/song-list'
   import Scroll from 'base/scroll/scroll'
   import SwitchTab from 'base/switch-tab/switch-tab'
@@ -50,10 +51,24 @@
           {
             name: '最近听的'
           }
-        ]
+        ],
       }
     },
     computed: {
+      noResult() {
+        if(this.switchesIndex === 0){
+          return !this.playHistory.length
+        }else{
+          return !this.favoriteList.length
+        }
+      },
+      noResultDesc() {
+        if(this.switchesIndex === 0){
+          return '你还没有收藏的歌曲~'
+        }else{
+          return '你还没有听过歌'
+        }
+      },
       ...mapGetters([
         'favoriteList',
         'playHistory'
@@ -62,7 +77,6 @@
     methods: {
       handlePlaylist(playlist) {
         const bottom = playlist.length>0 ? '60px' : ""
-        console.info(bottom)
         this.$refs.listWrapper.style.bottom = bottom
         this.$refs.favoriteList && this.$refs.favoriteList.refresh()
         this.$refs.playList && this.$refs.playList.refresh()
@@ -91,7 +105,7 @@
       ])
     },
     components: {
-      SwitchTab, Scroll, SongList
+      SwitchTab, Scroll, SongList, NoResult
     }
   }
 </script>
